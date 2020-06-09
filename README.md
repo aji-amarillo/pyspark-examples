@@ -9,6 +9,7 @@ To view these files, please do the following:
 - For jupyter notebook files, add the <b>.ipynb</b> extension.
 - SQL files can be viewed directly.
 
-These files give a small glimpse into the work I have done in the past, using sql, spark and python. All information has been anonymised in order to give you a better idea of my ability to code, think logically and solve problems. Please do not share!
+
+<i>These files give a small glimpse into the work I have done in the past, using sql, spark and python. All information has been anonymised in order to give you a better idea of my ability to code, think logically and solve problems. Please do not share!</i>
 
 I hope you enjoy it! Thank you!

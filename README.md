@@ -7,3 +7,4 @@ To view these files, please do the following:
 3. In the new window, go to <b>file</b> and select <b>save as</b>
 - For html files, add the <b>.html</b> extension.
 - For jupyter notebook files, add the <b>.ipynb</b> extension.
+- SQL files can be viewed directly.

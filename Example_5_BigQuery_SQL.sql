@@ -13,7 +13,7 @@ FROM (
 		COUNT(DISTINCT visitId) AS nr_sessions
 		--> a session has a unique ID, usually defined by time-bound criteria (e.g. any activity within 30 mins). A session can have multiple visits.
 
-		FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`
+		FROM `GoogleAnalyticsSample.ga_sessions_export`
 
 		GROUP BY 1
 		ORDER BY 2 DESC
@@ -43,7 +43,7 @@ FROM
 			FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", TIMESTAMP_SECONDS(visitStartTime)) AS session_timestamp,
 			MIN(FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", TIMESTAMP_MILLIS(1000 * visitStartTime + h.time))) AS hitStart_timestamp, -- when the action was recorded
 						
-			FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+			FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 			WHERE h.eventAction = 'checkout.loaded' -- event 'order_confirmation.loaded' does not exist, used 'checkout.loaded' instead as a proxy
 			AND h.isInteraction = True
 
@@ -66,7 +66,7 @@ FROM (
 		DATETIME_DIFF(CAST(lp.session_start AS datetime), CAST(oc.confirmation_end AS datetime), second) AS time_difference_bw_events
 
 		--> It pulls out users who started a session
-		FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export` ga
+		FROM `GoogleAnalyticsSample.ga_sessions_export` ga
 		LEFT JOIN 
 				(	
 				SELECT
@@ -75,7 +75,7 @@ FROM (
 			  	MIN(FORMAT_TIMESTAMP("%Y-%m-%d", TIMESTAMP_SECONDS(visitStartTime))) AS session_date,
         		MIN(FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", TIMESTAMP_SECONDS(visitStartTime))) AS session_start
 				
-				FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+				FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 				WHERE h.eventAction = 'shop_list.loaded'
 				
 				GROUP BY 1,2
@@ -91,7 +91,7 @@ FROM (
 			  	MIN(FORMAT_TIMESTAMP("%Y-%m-%d", TIMESTAMP_SECONDS(visitStartTime))) AS session_date,
         		MIN(FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", TIMESTAMP_SECONDS(visitStartTime))) AS confirmation_end --> assumes it as event timestamp
 				
-				FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+				FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 				WHERE h.eventAction = 'checkout.loaded' -- event 'order_confirmation.loaded' does not exist
 
 				GROUP BY 1,2
@@ -122,7 +122,7 @@ FROM
 		-- FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", TIMESTAMP_MILLIS(1000 * visitStartTime + h.time)) AS hitStart_timestamp, # verifies unique events
 		COUNT(h.eventAction) AS nr_events
 
-		FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+		FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 		WHERE h.eventAction = 'order_payment_method.chosen'
 
 		GROUP BY 1,2,3
@@ -146,7 +146,7 @@ FROM
 	visitId AS session_id,
 	MIN(FORMAT_TIMESTAMP("%Y-%m-%d", TIMESTAMP_SECONDS(visitStartTime))) AS session_date,
 
-	FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+	FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 	WHERE h.eventAction = 'shop_list.loaded'
 
 	GROUP BY 1,2
@@ -160,7 +160,7 @@ LEFT JOIN
 	visitId AS session_id,
 			  	MIN(FORMAT_TIMESTAMP("%Y-%m-%d", TIMESTAMP_SECONDS(visitStartTime))) AS session_date,
 	
-	FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+	FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 	WHERE h.eventAction = 'shop_details.loaded'
 
 	GROUP BY 1,2
@@ -197,7 +197,7 @@ FROM
 			SUM(visits) AS nr_visits_per_session
 
 
-			FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
+			FROM `GoogleAnalyticsSample.ga_sessions_export`, UNNEST(hit) AS h
 
 			GROUP BY 1,2,3
 			HAVING SUM(visits) > 10
@@ -214,7 +214,7 @@ LIMIT 10; --> additionally, dense_rank() and row_number() can also be used
 
 
 ##### 6. SEMI-STRUCTURED TABLE
-WITH `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export` AS (
+WITH `GoogleAnalyticsSample.ga_sessions_export` AS (
 	SELECT
 	A.platform, A.yyyy_mm_dd, A.country,
 	SUM(A.nr_sessions) AS nr_sessions
@@ -226,7 +226,7 @@ WITH `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export` AS (
 		FORMAT_TIMESTAMP("%Y-%m-%d", TIMESTAMP_SECONDS(visitStartTime)) AS yyyy_mm_dd, country, operatingSystem AS platform,
 		COUNT(DISTINCT visitId) AS nr_sessions
 
-		FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export`
+		FROM `GoogleAnalyticsSample.ga_sessions_export`
 
 		GROUP BY 1,2,3,4
 	    ORDER BY 1,2 DESC
@@ -235,4 +235,4 @@ WITH `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export` AS (
 	GROUP BY 1,2,3
 	ORDER BY 2,1,3 DESC)
 
-SELECT j, TO_JSON_STRING(j) AS semi_str FROM `dhh-analytics-hiringspace.GoogleAnalyticsSample.ga_sessions_export` j
+SELECT j, TO_JSON_STRING(j) AS semi_str FROM `GoogleAnalyticsSample.ga_sessions_export` j
